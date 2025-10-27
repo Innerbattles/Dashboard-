@@ -251,7 +251,7 @@ function showCongratsToday(winnerName, todayCount, passedName){
   metaTextEl.textContent=passedName?`just passed ${passedName} today! 🎉`:`is climbing today! 🎉`;
   todayEl.textContent=`Today: ${todayCount}`;
   overlay.style.display='grid'; spawnConfetti();
-  setTimeout(()=> overlay.style.display='none', 10000);
+  setTimeout(()=> overlay.style.display='none', 15000);
 }
 function buildTodayRanking(list){
   const copy=list.map(p=>({nameKey:p.nameKey,name:p.name,today:p.today||0}));
