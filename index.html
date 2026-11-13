@@ -33,7 +33,7 @@ html,body{
 #board{
   position:relative; z-index:1; overflow:hidden;
   width:100vw; height:100vh;
-  padding:calc(4.2*var(--vh)) calc(1.6*var(--vh)) calc(3.2*var(--vh));
+  padding:calc(4.2*var(--vh)) calc(1.6*var(--vh)) calc(9.8*var(--vh));
   box-sizing:border-box;
   background:
     radial-gradient(ellipse at 20% 0%, rgba(242,201,76,.20), transparent 55%),
@@ -227,6 +227,60 @@ tbody tr:nth-child(even) .avatar{
   filter:drop-shadow(0 -2px 6px rgba(255,255,255,.35));
 }
 
+/* ===== 🧝🦌 ESCENAS: DUENDE Y VENADO ===== */
+.chase{
+  position:absolute; left:0; right:0; bottom:calc(1.8*var(--vh));
+  height:calc(9*var(--vh)); pointer-events:none; z-index:2;
+}
+.actor{
+  position:absolute; left:0; bottom:0;
+  transform-origin:50% 100%; will-change:transform;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));
+}
+.flip{ transform:scaleX(var(--dir,1)); }
+.actor svg{ display:block; overflow:visible; }
+.elf { height:calc(7*var(--vh)); width:calc(7*var(--vh)*72/90); }
+.deer{ height:calc(8*var(--vh)); width:calc(8*var(--vh)*124/90); }
+.gift{
+  position:absolute; bottom:0; font-size:calc(3.6*var(--vh)); line-height:1;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));
+}
+.fx{
+  position:absolute; font-size:calc(2.8*var(--vh)); line-height:1;
+  opacity:0; z-index:5;
+}
+
+.actor .leg, .actor .arm, .actor .head, .actor .halo{ transform-box:view-box; }
+
+[data-gait="run"]  .leg{ animation:legSwing .5s  ease-in-out infinite alternate; }
+[data-gait="fast"] .leg{ animation:legSwing .32s ease-in-out infinite alternate; }
+[data-gait="walk"] .leg{ animation:legWalk  .85s ease-in-out infinite alternate; }
+[data-gait] .leg.b{ animation-direction:alternate-reverse; }
+
+[data-gait="run"]  .arm{ animation:armSwing .5s  ease-in-out infinite alternate; }
+[data-gait="fast"] .arm{ animation:armSwing .32s ease-in-out infinite alternate; }
+[data-gait="walk"] .arm{ animation:armWalk  .85s ease-in-out infinite alternate; }
+[data-gait="cheer"] .arm{ transform:rotate(-80deg); }
+
+[data-gait="run"]  .bob{ animation:bob .5s  ease-in-out infinite; }
+[data-gait="fast"] .bob{ animation:bob .32s ease-in-out infinite; }
+[data-gait="walk"] .bob{ animation:bobSoft .85s ease-in-out infinite; }
+
+[data-gait="run"] .pom, [data-gait="fast"] .pom{ animation:pomBob .5s ease-in-out infinite alternate; }
+[data-gait="happy"] .head{ animation:nod .7s ease-in-out infinite alternate; }
+
+.actor .halo{ transform-origin:111px 31px; animation:noseGlow 1.1s ease-in-out infinite alternate; }
+
+@keyframes legSwing{ from{ transform:rotate(-38deg); } to{ transform:rotate(38deg); } }
+@keyframes legWalk { from{ transform:rotate(-20deg); } to{ transform:rotate(20deg); } }
+@keyframes armSwing{ from{ transform:rotate(-28deg); } to{ transform:rotate(22deg); } }
+@keyframes armWalk { from{ transform:rotate(-12deg); } to{ transform:rotate(12deg); } }
+@keyframes bob     { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+@keyframes bobSoft { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-1.5px); } }
+@keyframes pomBob  { from{ transform:translate(-1px,1px); } to{ transform:translate(2px,-2px); } }
+@keyframes nod     { from{ transform:rotate(-6deg); } to{ transform:rotate(10deg); } }
+@keyframes noseGlow{ from{ opacity:.25; transform:scale(.8); } to{ opacity:.95; transform:scale(1.5); } }
+
 /* ===== OVERLAY — RankUp ===== */
 #overlay.cod{
   position:fixed; inset:0; display:none; place-items:center; z-index:999;
@@ -409,6 +463,110 @@ tbody tr:nth-child(even) .avatar{
   <div id='meta'>
     <div id='diag'>Loading…</div>
     <div class='dots' id='dots'></div>
+  </div>
+
+  <!-- 🧝🦌 Escenas del duende y el venado (las maneja el JS) -->
+  <div class="chase" id="chase" aria-hidden="true">
+
+    <!-- ===== VENADO (Rudolph) ===== -->
+    <div class="actor" id="deerA" style="transform:translateX(-9999px)"><div class="flip">
+      <svg class="deer" viewBox="0 0 124 90" xmlns="http://www.w3.org/2000/svg">
+        <g class="leg b" style="transform-origin:31px 60px">
+          <rect x="28" y="60" width="6" height="26" rx="3" fill="#5e3a1b"/>
+          <rect x="27.5" y="83" width="7" height="4.5" rx="2" fill="#2b1a0c"/>
+        </g>
+        <g class="leg a" style="transform-origin:67px 60px">
+          <rect x="64" y="60" width="6" height="26" rx="3" fill="#5e3a1b"/>
+          <rect x="63.5" y="83" width="7" height="4.5" rx="2" fill="#2b1a0c"/>
+        </g>
+
+        <g class="bob">
+          <circle cx="17" cy="47" r="5" fill="#fff"/>
+          <ellipse cx="50" cy="52" rx="32" ry="15" fill="#8b5a2b"/>
+          <ellipse cx="52" cy="60" rx="22" ry="6" fill="#d2a672"/>
+          <path d="M38 38 Q50 34 62 38 L60 54 Q50 58 40 54 Z" fill="#1f8a5b" stroke="#f2c94c" stroke-width="1.5"/>
+          <circle cx="50" cy="46" r="2.6" fill="#f2c94c"/>
+
+          <g class="head" style="transform-origin:84px 50px">
+            <path d="M72 44 L82 22 L96 28 L86 54 Z" fill="#8b5a2b"/>
+            <path d="M76 40 L90 34 L92 41 L79 48 Z" fill="#c0283a"/>
+            <path d="M82 38 L84 45 M87 36 L89 43" stroke="#fff" stroke-width="1.6"/>
+            <path d="M78 46 L74 58 L80 57 L83 48 Z" fill="#c0283a"/>
+            <circle cx="77" cy="59" r="2.2" fill="#f2c94c"/>
+            <ellipse cx="97" cy="27" rx="11" ry="8" fill="#8b5a2b" transform="rotate(15 97 27)"/>
+            <ellipse cx="106" cy="31" rx="6.5" ry="5" fill="#b07b45"/>
+            <circle class="halo" cx="111" cy="31" r="7" fill="rgba(255,50,70,.55)"/>
+            <circle cx="111" cy="31" r="3.6" fill="#ff2a3d"/>
+            <circle cx="110" cy="30" r="1" fill="#ffb3bb"/>
+            <circle cx="100" cy="25" r="1.9" fill="#1a1a1a"/>
+            <circle cx="100.6" cy="24.4" r=".6" fill="#fff"/>
+            <ellipse cx="90" cy="19" rx="3" ry="6" fill="#8b5a2b" transform="rotate(-35 90 19)"/>
+            <ellipse cx="90" cy="19.5" rx="1.4" ry="3.6" fill="#e9a3a0" transform="rotate(-35 90 19)"/>
+            <g stroke="#e3c79a" stroke-width="2.6" stroke-linecap="round" fill="none">
+              <path d="M95 19 Q93 10 90 4"/>
+              <path d="M93.5 13 L87 10"/>
+              <path d="M91.5 8 L94 2"/>
+              <path d="M99 19 Q100 10 98 3"/>
+              <path d="M99.5 12 L105 9"/>
+              <path d="M98.7 7 L96 1"/>
+            </g>
+          </g>
+        </g>
+
+        <g class="leg a" style="transform-origin:39px 60px">
+          <rect x="36" y="60" width="6" height="26" rx="3" fill="#8b5a2b"/>
+          <rect x="35.5" y="83" width="7" height="4.5" rx="2" fill="#2b1a0c"/>
+        </g>
+        <g class="leg b" style="transform-origin:75px 60px">
+          <rect x="72" y="60" width="6" height="26" rx="3" fill="#8b5a2b"/>
+          <rect x="71.5" y="83" width="7" height="4.5" rx="2" fill="#2b1a0c"/>
+        </g>
+      </svg>
+    </div></div>
+
+    <!-- ===== DUENDE ===== -->
+    <div class="actor" id="elfA" style="transform:translateX(-9999px)"><div class="flip">
+      <svg class="elf" viewBox="0 0 72 90" xmlns="http://www.w3.org/2000/svg">
+        <g class="leg b" style="transform-origin:29.5px 68px">
+          <rect x="26" y="68" width="7" height="14" rx="3" fill="#7d1623"/>
+          <rect x="26" y="73" width="7" height="3" fill="#e9e1d3"/>
+          <ellipse cx="30" cy="85" rx="7" ry="3.5" fill="#5b3a1d"/>
+          <circle cx="37" cy="82.5" r="2" fill="#5b3a1d"/>
+        </g>
+        <g class="bob">
+          <path d="M22 34 L9 27 L22 41 Z" fill="#f2c79b"/>
+          <path d="M20 44 L44 44 L50 68 L14 68 Z" fill="#1f8a5b"/>
+          <rect x="13" y="66" width="38" height="4" rx="2" fill="#fff"/>
+          <rect x="18" y="54" width="28" height="4" fill="#3b2a1a"/>
+          <rect x="29" y="53" width="6" height="6" rx="1" fill="#f2c94c"/>
+          <circle cx="32" cy="47" r="1.3" fill="#f2c94c"/>
+          <circle cx="32" cy="62" r="1.3" fill="#f2c94c"/>
+          <ellipse cx="32" cy="44.5" rx="10" ry="3.2" fill="#c0283a"/>
+          <circle cx="32" cy="33" r="11" fill="#f7d1a3"/>
+          <circle cx="37" cy="35" r="1.7" fill="#1a1a1a"/>
+          <circle cx="37.6" cy="34.4" r=".5" fill="#fff"/>
+          <circle cx="40" cy="39" r="2.3" fill="#f4a7a0" opacity=".75"/>
+          <circle cx="43" cy="36.5" r="1.8" fill="#f0a47a"/>
+          <path d="M33 40 Q37 44 41 40" stroke="#7a3b2e" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <path d="M20 26 Q22 6 52 4 Q40 12 44 26 Z" fill="#c0283a"/>
+          <rect x="19" y="24" width="27" height="6" rx="3" fill="#fff"/>
+          <g class="pom"><circle cx="53" cy="4" r="4.6" fill="#fff"/></g>
+        </g>
+        <g class="leg a" style="transform-origin:38.5px 68px">
+          <rect x="35" y="68" width="7" height="14" rx="3" fill="#c0283a"/>
+          <rect x="35" y="73" width="7" height="3" fill="#fff"/>
+          <ellipse cx="39" cy="85" rx="7" ry="3.5" fill="#8b5a2b"/>
+          <circle cx="46" cy="82.5" r="2" fill="#8b5a2b"/>
+        </g>
+        <g class="arm" style="transform-origin:40px 48px">
+          <rect x="40" y="45" width="14" height="6" rx="3" fill="#1f8a5b"/>
+          <circle cx="55" cy="48" r="3.4" fill="#f7d1a3"/>
+          <path d="M55 48 L55 34 Q55 28 61 28 Q66 28 66 33" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+          <path d="M55 48 L55 34 Q55 28 61 28 Q66 28 66 33" stroke="#d62839" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-dasharray="3 3.2"/>
+        </g>
+      </svg>
+    </div></div>
+
   </div>
 </div>
 
@@ -1061,6 +1219,269 @@ function rotatePage(){
   PAGE_INDEX=(PAGE_INDEX+1)%totalPages;
 }
 
+/* ===== 🧝🦌 ESCENAS ALEATORIAS: DUENDE Y VENADO ===== */
+(function(){
+  const chase=document.getElementById('chase');
+  const elfA =document.getElementById('elfA');
+  const deerA=document.getElementById('deerA');
+  if(!chase||!elfA||!deerA) return;
+
+  const OFF='translateX(-9999px)';
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const lin=u=>u;
+  const easeOut=u=>1-(1-u)*(1-u);
+  const easeIn=u=>u*u;
+  const easeInOut=u=>u<.5?2*u*u:1-2*(1-u)*(1-u);
+
+  let timers=[], anims=[], props=[];
+  const later=(fn,ms)=>timers.push(setTimeout(fn,ms));
+
+  /* Emoji flotante sobre un personaje */
+  function fx(ch, actor, dx=0, dy=0){
+    const cr=chase.getBoundingClientRect(), ar=actor.getBoundingClientRect();
+    const e=document.createElement('div');
+    e.className='fx'; e.textContent=ch;
+    e.style.left=(ar.left-cr.left+ar.width/2+dx)+'px';
+    e.style.bottom=(cr.bottom-ar.top+dy)+'px';
+    chase.appendChild(e);
+    const a=e.animate([
+      {transform:'translate(-50%,0) scale(.6)',opacity:0},
+      {transform:'translate(-50%,-1.5vh) scale(1)',opacity:1,offset:.2},
+      {transform:'translate(-50%,-6vh) scale(1.15)',opacity:0}
+    ],{duration:1400,easing:'ease-out'});
+    a.finished.then(()=>e.remove()).catch(()=>e.remove());
+  }
+  function stars(actor){
+    ['⭐','💫','✨','⭐'].forEach((c,i)=>later(()=>fx(c,actor,(i-1.5)*12),i*420));
+  }
+  function repeatFx(ch,actor,from,to,every){
+    for(let t=from;t<to;t+=every) later(()=>fx(ch,actor),t);
+  }
+
+  /* Motor: cada personaje sigue una lista de segmentos.
+     s = posicion del borde trasero en el sentido de avance (px)
+     y = altura, r = rotacion (grados), hop = {h,n} saltitos,
+     gait = modo de piernas, fx = funcion que se dispara al inicio */
+  function launch(actor, dir, W, s0, segs){
+    const w=actor.offsetWidth;
+    const toPx=s=> dir>0 ? s : W-s-w;
+    const frames=[{t:0,s:s0,y:0,r:0}];
+    let t=0, s=s0, y=0, r=0;
+
+    segs.forEach(g=>{
+      const ts=t;
+      if(g.gait) later(()=>{ actor.dataset.gait=g.gait; },ts);
+      if(g.fx)   later(g.fx,ts);
+      const s1=g.s!==undefined?g.s:s;
+      const y1=g.y!==undefined?g.y:y;
+      const r1=g.r!==undefined?g.r:r;
+      const ease=g.ease||lin;
+      const steps=Math.max(2,Math.ceil(g.d/40));
+      for(let i=1;i<=steps;i++){
+        const u=i/steps, e=ease(u);
+        let yy=y+(y1-y)*e;
+        if(g.hop) yy-=g.hop.h*Math.abs(Math.sin(g.hop.n*Math.PI*u));
+        frames.push({t:ts+g.d*u, s:s+(s1-s)*e, y:yy, r:r+(r1-r)*e});
+      }
+      t+=g.d; s=s1; y=y1; r=r1;
+    });
+
+    const total=t;
+    const kf=frames.map(f=>({
+      offset:Math.min(1,f.t/total),
+      transform:`translate(${toPx(f.s)}px,${f.y}px) rotate(${f.r*dir}deg)`
+    }));
+    actor.style.setProperty('--dir',dir);
+    actor.style.transform=kf[0].transform;
+    actor.dataset.gait='idle';
+    const a=actor.animate(kf,{duration:total,fill:'forwards',easing:'linear'});
+    anims.push({a,actor});
+    return total;
+  }
+
+  function cleanup(){
+    timers.forEach(clearTimeout); timers=[];
+    anims.forEach(({a,actor})=>{
+      try{a.cancel();}catch(e){}
+      actor.style.transform=OFF;
+      actor.dataset.gait='idle';
+    });
+    anims=[];
+    props.forEach(p=>p.remove()); props=[];
+  }
+
+  async function play(dir,W,jobs){
+    const totals=jobs.map(j=>launch(j.actor,dir,W,j.s0,j.segs));
+    await wait(Math.max(...totals)+250);
+    cleanup();
+  }
+
+  function ctx(){
+    const W=chase.clientWidth;
+    return {
+      W, vh:window.innerHeight/100,
+      wE:elfA.offsetWidth, wD:deerA.offsetWidth,
+      vr:W/14000            /* velocidad de carrera (px/ms): cruza en ~14s */
+    };
+  }
+
+  /* ---------- ESCENA 1: persecucion clasica ---------- */
+  async function sceneChase(dir){
+    const {W,vh,wE,wD,vr}=ctx();
+    const gap=wE+5*vh, sd0=-wD-30, se0=sd0-gap, sdE=W+30+gap;
+    const dist=sdE-sd0, T=dist/vr, N=6;
+    const eSegs=[];
+    for(let k=1;k<=N;k++){
+      eSegs.push({d:T/N, s:sd0+dist*k/N-(gap-(k%2?2.6*vh:0)), gait:k===1?'run':undefined});
+    }
+    await play(dir,W,[
+      {actor:deerA,s0:sd0,segs:[{d:T,s:sdE,gait:'run'}]},
+      {actor:elfA, s0:se0,segs:eSegs}
+    ]);
+  }
+
+  /* ---------- ESCENA 2: lo alcanza y lo celebran ---------- */
+  async function sceneCatch(dir){
+    const {W,vh,wE,wD,vr}=ctx();
+    const sd0=-wD-30, se0=sd0-(wE+18*vh);
+    const sdStop=W*0.56, sdF=sdStop+40, t1=(sdStop-sd0)/vr;
+    const seCatch=sdF-wE-6;
+    const sdEnd=W+30+wE+6, seEnd=W+30;
+    const walkMs=(sdEnd-sdF)/(vr*0.55);
+    const hearts=()=>{
+      fx('❤️',deerA);
+      later(()=>fx('❤️',elfA),450);
+      later(()=>fx('🎁',elfA,10),1000);
+      later(()=>fx('❤️',deerA,-8),1500);
+    };
+    await play(dir,W,[
+      {actor:deerA,s0:sd0,segs:[
+        {d:t1,s:sdStop,gait:'run'},
+        {d:700,s:sdF,ease:easeOut},
+        {d:2600,gait:'happy'},
+        {d:walkMs,s:sdEnd,gait:'walk'}
+      ]},
+      {actor:elfA,s0:se0,segs:[
+        {d:t1+400,s:seCatch-40,gait:'run'},
+        {d:300,s:seCatch,ease:easeOut},
+        {d:2600,gait:'cheer',hop:{h:3*vh,n:3},fx:hearts},
+        {d:walkMs,s:seEnd,gait:'walk'}
+      ]}
+    ]);
+  }
+
+  /* ---------- ESCENA 3: el duende se tropieza con un regalo ---------- */
+  async function sceneTrip(dir){
+    const {W,vh,wE,wD,vr}=ctx();
+    const gap=wE+5*vh, sd0=-wD-30, se0=sd0-gap, sdE=W+30+gap, seE=W+30;
+
+    const gift=document.createElement('div');
+    gift.className='gift'; gift.textContent='🎁';
+    chase.insertBefore(gift,deerA); props.push(gift);
+    const gw=gift.offsetWidth, gS=W*0.5;
+    gift.style.left=(dir>0?gS:W-gS-gw)+'px';
+    const kick=()=>gift.animate([
+      {transform:'translate(0,0) rotate(0deg)'},
+      {transform:`translate(${dir*10*vh}px,-6vh) rotate(${dir*300}deg)`,offset:.5},
+      {transform:`translate(${dir*20*vh}px,0) rotate(${dir*720}deg)`}
+    ],{duration:900,easing:'ease-out',fill:'forwards'});
+
+    /* el venado salta el regalo completo (patas traseras incluidas) */
+    const sdJ=gS-wD-2*vh;
+    const hopD=wD+gw+4*vh, hopMs=hopD/(vr*1.35), sdAfter=sdJ+hopD;
+
+    const seT=gS-wE-10, sSlide=seT+3*vh, sGet=sSlide+8*vh;
+
+    await play(dir,W,[
+      {actor:deerA,s0:sd0,segs:[
+        {d:(sdJ-sd0)/vr,s:sdJ,gait:'run'},
+        {d:hopMs,s:sdAfter,hop:{h:6.5*vh,n:1}},
+        {d:(sdE-sdAfter)/vr,s:sdE}
+      ]},
+      {actor:elfA,s0:se0,segs:[
+        {d:(seT-se0)/vr,s:seT,gait:'run'},
+        {d:420,s:sSlide,y:-wE*0.5,r:84,ease:easeIn,gait:'fast',fx:kick},
+        {d:650,s:sGet,ease:easeOut,gait:'idle'},
+        {d:1900,fx:()=>stars(elfA)},
+        {d:520,y:0,r:0,ease:easeInOut},
+        {d:600,hop:{h:1.2*vh,n:2}},
+        {d:(seE-sGet)/(vr*1.25),s:seE,gait:'run'}
+      ]}
+    ]);
+  }
+
+  /* ---------- ESCENA 4: el venado frena y el duende se estampa ---------- */
+  async function sceneBump(dir){
+    const {W,vh,wE,wD,vr}=ctx();
+    const gap=wE+5*vh, sd0=-wD-30, se0=sd0-gap;
+    const sdStop=W*0.5, sdF=sdStop+3.5*vh, t1=(sdStop-sd0)/vr;
+    const seB=sdF-wE+8, tb=(seB-se0)/vr;
+    const sSit=seB-4.5*vh;
+    const sdEnd=W+30+(wE-8+4.5*vh), seEnd=W+30;
+    const walkMs=(seEnd-sSit)/(vr*0.55);
+    const elfT=300+320+1800+450;
+    const hold=Math.max(400,(tb+elfT)-(t1+450));
+
+    await play(dir,W,[
+      {actor:deerA,s0:sd0,segs:[
+        {d:t1,s:sdStop,gait:'run'},
+        {d:450,s:sdF,ease:easeOut},
+        {d:hold,gait:'happy'},
+        {d:walkMs,s:sdEnd,gait:'walk'}
+      ]},
+      {actor:elfA,s0:se0,segs:[
+        {d:tb,s:seB,gait:'run'},
+        {d:300,s:seB-4*vh,r:-16,hop:{h:2*vh,n:1},ease:easeOut,gait:'idle',fx:()=>fx('💥',elfA,18,-4)},
+        {d:320,s:sSit,r:-28,ease:easeOut},
+        {d:1800,fx:()=>stars(elfA)},
+        {d:450,r:0,ease:easeInOut},
+        {d:walkMs,s:seEnd,gait:'walk'}
+      ]}
+    ]);
+  }
+
+  /* ---------- ESCENA 5: ahora el venado persigue al duende asustado ---------- */
+  async function sceneScared(dir){
+    const {W,vh,wE,wD,vr}=ctx();
+    const se0=-wE-30, sd0=se0-wD-6*vh, seE=W+wD+6*vh+60;
+    const dist=seE-se0, T=dist/(vr*1.1);
+    const gaps=[4.2,2.2,1.2,6].map(g=>g*vh);
+    const dSegs=gaps.map((g,i)=>({
+      d:T/4, s:se0+dist*(i+1)/4-wD-g, gait:i===0?'run':undefined
+    }));
+    repeatFx('💦',elfA,400,T-300,520);
+    await play(dir,W,[
+      {actor:elfA, s0:se0,segs:[{d:T,s:seE,gait:'fast'}]},
+      {actor:deerA,s0:sd0,segs:dSegs}
+    ]);
+  }
+
+  /* ---------- Rotacion aleatoria de escenas ---------- */
+  const SCENES=[sceneChase,sceneCatch,sceneTrip,sceneBump,sceneScared];
+  const NAMES={chase:0,catch:1,trip:2,bump:3,scared:4};
+  /* Para probar una escena fija: agrega ?scene=chase|catch|trip|bump|scared a la URL */
+  let forced=null;
+  try{
+    const q=new URLSearchParams(location.search).get('scene');
+    if(q && NAMES.hasOwnProperty(q)) forced=NAMES[q];
+  }catch(e){}
+
+  (async function loop(){
+    await wait(2000);
+    let last=-1;
+    for(;;){
+      let i;
+      if(forced!==null) i=forced;
+      else do{ i=Math.floor(Math.random()*SCENES.length); }while(i===last);
+      last=i;
+      const dir=Math.random()<.5?1:-1;      /* izquierda->derecha o al reves */
+      try{ await SCENES[i](dir); }
+      catch(e){ console.error('escena',e); cleanup(); }
+      await wait(forced!==null?1500:2500+Math.random()*5500);
+    }
+  })();
+})();
+
 /* ===== START APP ===== */
 (async function start(){
   updateXmasChip();
@@ -1078,4 +1499,3 @@ function rotatePage(){
 </script>
 </body>
 </html>
-
