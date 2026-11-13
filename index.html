@@ -3,251 +3,387 @@
 <head>
 <meta charset='utf-8'/>
 <meta name='viewport' content='width=device-width, initial-scale=1'/>
-<title>Neon Leaderboard — Transfers</title>
+<title>Leaderboard Navideño 🎄</title>
+
 <style>
-  :root{
-    --vh: 1vh;
-    --from:#06101f; --to:#061c16; --ink:#ecfff8;
-    --neon:#00f5ff; --neon2:#36ff9f; --neon3:#b96cff;
-    --glass: rgba(8,22,34,.58);
-    --glass-strong: rgba(8,28,42,.74);
-    --line: rgba(0,245,255,.22);
-  }
-  html,body{margin:0;height:100%;width:100%;background:#03070d;color:var(--ink);
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;}
-  body::before, body::after{
-    content:""; position:fixed; inset:-20%;
-    background: radial-gradient(40% 40% at 20% 20%, rgba(255,255,255,.35), transparent),
-                radial-gradient(35% 35% at 80% 10%, rgba(255,255,255,.25), transparent),
-                radial-gradient(30% 30% at 50% 90%, rgba(255,255,255,.18), transparent);
-    z-index:0; pointer-events:none; mix-blend-mode:soft-light; animation:float 22s linear infinite;
-  }
-  body::after{ animation-direction:reverse; animation-duration:27s; opacity:.7; }
-  @keyframes float{ 0%{transform:translate3d(0,0,0)} 50%{transform:translate3d(2%, -2%, 0)} 100%{transform:translate3d(0,0,0)} }
+:root{
+  --vh: 1vh;
 
-  #board{
-    position:relative; z-index:1;
-    width:100vw;height:100vh; padding:calc(1.2*var(--vh)) calc(1.6*var(--vh)); box-sizing:border-box;
-    background:
-      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
-      radial-gradient(900px 500px at 15% 10%, rgba(0,245,255,.18), transparent 55%),
-      radial-gradient(700px 450px at 90% 20%, rgba(185,108,255,.16), transparent 60%),
-      linear-gradient(135deg,var(--from),#092b3a,var(--to));
-    background-size:42px 42px,42px 42px,auto,auto,auto;
-    display:flex;flex-direction:column;gap:calc(0.8*var(--vh));
-  }
-
-  h2{
-    margin:0;text-align:center;font-weight:900;letter-spacing:.3px;
-    font-size:calc(3.7*var(--vh)); line-height:1.1;
-    color:#fff; text-shadow:0 0 10px rgba(0,245,255,.65), 0 0 18px rgba(54,255,159,.25); animation:titlePulse 3.5s ease-in-out infinite;
-  }
-  @keyframes titlePulse{ 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.22)} }
-
-  .total-card{
-    position:absolute; top:calc(1.25*var(--vh)); right:calc(1.6*var(--vh)); z-index:5;
-    min-width:150px; padding:calc(.85*var(--vh)) calc(1.15*var(--vh)); border-radius:18px;
-    background:linear-gradient(135deg, rgba(54,255,159,.20), rgba(0,245,255,.10));
-    border:1px solid rgba(54,255,159,.75);
-    box-shadow:0 0 24px rgba(54,255,159,.35), inset 0 0 18px rgba(255,255,255,.08);
-    backdrop-filter: blur(10px); text-align:right; overflow:hidden;
-  }
-  .total-card::before{content:""; position:absolute; inset:-80% -30%; background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent); transform:rotate(25deg); animation:sweep 5s linear infinite;}
-  @keyframes sweep{ from{translate:-120% 0} to{translate:120% 0} }
-  .total-label{position:relative;text-transform:uppercase;letter-spacing:.8px;font-weight:900;font-size:calc(1.25*var(--vh));color:#bffcff;}
-  .total-value{position:relative;font-size:calc(3.35*var(--vh));line-height:1;font-weight:1000;color:#36ff9f;text-shadow:0 0 8px #000, 0 0 18px rgba(54,255,159,.95), 0 0 30px rgba(54,255,159,.75);}
-  .total-source{position:relative;font-size:calc(1.05*var(--vh));font-weight:800;color:rgba(236,255,248,.62);}
-
-  .chips{
-    display:flex;gap:calc(.6*var(--vh));flex-wrap:wrap;
-    justify-content:center;margin-top:calc(-.3*var(--vh));
-  }
-  .chip{
-    padding:calc(.35*var(--vh)) calc(.8*var(--vh));
-    border-radius:999px;
-    background:var(--glass);
-    backdrop-filter: blur(10px);
-    border:1px solid var(--line);
-    color:#dcfff6;
-    font-weight:750;font-size:calc(1.45*var(--vh));
-    box-shadow: 0 6px 16px rgba(0,0,0,.08) inset, 0 1px 0 rgba(255,255,255,.4);
-  }
-
-  .table-wrap{ flex:1; min-height:0; position:relative; }
-  table{
-    width:100%; height:100%;
-    border-collapse:separate; border-spacing:0 10px;
-    table-layout:fixed; font-size:calc(1.7*var(--vh));
-  }
-  thead th{
-    position:sticky; top:0; z-index:2;
-    background:var(--glass-strong);
-    backdrop-filter: blur(10px);
-    color:#dfffff;
-    text-transform:uppercase; letter-spacing:.55px;
-    font-size:calc(1.55*var(--vh)); font-weight:800; padding:calc(.6*var(--vh)) calc(0.9*var(--vh));
-    border-radius:10px;
-    border:1px solid rgba(0,0,0,.08);
-  }
-  th.col-rank, td.col-rank { width:9%; text-align:center; }
-  th.col-agent,td.col-agent{ width:30%; text-align:left; }
-  th.col-today,td.col-today{ width:12%; text-align:center; }
-  th.col-day,  td.col-day  { width:7%;  text-align:center; }
-  th.col-total,td.col-total{ width:12%; text-align:center; }
-
-  tbody td{
-    background: rgba(6,22,34,.64);
-    border-top:1px solid rgba(0,245,255,.14);
-    border-bottom:1px solid rgba(0,245,255,.14);
-    box-shadow: inset 0 0 20px rgba(0,245,255,.035);
-    padding:calc(.7*var(--vh)) calc(0.9*var(--vh));
-    color:#f4ffff;
-    font-weight:750;
-    text-shadow:0 0 7px rgba(0,245,255,.25);
-  }
-  tbody tr td:first-child{ border-left:1px solid rgba(0,0,0,.06); border-top-left-radius:14px; border-bottom-left-radius:14px; }
-  tbody tr td:last-child { border-right:1px solid rgba(0,0,0,.06); border-top-right-radius:14px; border-bottom-right-radius:14px; }
-  tbody tr{ transition: transform .25s ease, box-shadow .25s ease; animation:rowIn .55s ease both; }
-  @keyframes rowIn{ from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:translateY(0)} }
-  tbody tr:hover{ transform: translateY(-3px) scale(1.006); box-shadow:0 0 28px rgba(0,245,255,.18); }
-
-  .agent-wrap{ display:flex; align-items:center; gap:12px; min-width:0; }
-  .avatar{
-    flex:0 0 auto; width:44px; height:44px; border-radius:50%;
-    background: linear-gradient(135deg, rgba(0,245,255,.30), rgba(54,255,159,.14));
-    border:1px solid rgba(0,245,255,.45);
-    display:grid; place-items:center;
-    font-weight:900; font-size:14px; letter-spacing:.5px;
-    color:#fff; text-transform:uppercase;
-    box-shadow: 0 0 14px rgba(0,245,255,.28), inset 0 0 12px rgba(255,255,255,.08);
-  }
-  .name{ font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:-.15px; color:#f7ffff; text-shadow:0 0 10px rgba(0,245,255,.18); }
-
-  .bar{ position:relative; height:22px; border-radius:999px; background:rgba(255,255,255,.10); border:1px solid rgba(0,245,255,.20); overflow:hidden; }
-  .bar > .fillbackground:linear-gradient(90deg, #00cfff, #007cf0);
-box-shadow:0 0 20px rgba(0,207,255,.45);
-  .bar > .fill::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.38), transparent); animation:barShine 2.2s linear infinite;}
-  @keyframes barShine{from{transform:translateX(-100%)} to{transform:translateX(100%)}
-  }
-  .bar.total > .fill{
-  background:linear-gradient(90deg, #ffd84d, #fff3a0);
-  box-shadow: 0 0 18px rgba(255, 216, 77, .65);
+  /* 🎄 Paleta navideña */
+  --pine:#0f3d2e;        /* verde pino */
+  --pine-dark:#082a20;
+  --berry:#9c1c2c;       /* rojo navideño */
+  --berry-dark:#6e0f1c;
+  --gold:#f2c94c;
+  --gold-soft:#ffe9a6;
+  --cream:#fff8ec;
+  --ink:#1b1410;
+  --glass: rgba(255,248,236,.16);
+  --glass-strong: rgba(255,248,236,.28);
 }
-  .bar .value{ position:relative; z-index:1; font-weight:1000; font-size:110%; color:#ffe66d; text-shadow:0 0 6px #000, 0 0 14px rgba(255,59,59,.95), 0 0 22px rgba(255,0,0,.7); }
 
-  .spark{ position:relative; height:20px; border-radius:9px; background:rgba(5,35,78,.78); border:1px solid rgba(74,163,255,.75);
-          overflow:hidden; display:grid; place-items:center; font-weight:1000; font-size:98%; color:#ffffff; text-shadow:0 0 6px #001, 0 0 12px rgba(74,163,255,.95); box-shadow:0 0 14px rgba(74,163,255,.25), inset 0 0 14px rgba(74,163,255,.18); }
-  .spark .f{ position:absolute; left:0; top:0; bottom:0; width:0%; background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.15); box-shadow:0 0 16px rgba(30,136,255,.65); transition:width .6s ease; }
+html,body{
+  margin:0;height:100%;width:100%;
+  background:var(--pine-dark);
+  color:var(--ink);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
 
-  #meta{ display:flex;justify-content:space-between;align-items:center; font-weight:800; font-size:calc(1.5*var(--vh)); }
-  .dots{ display:flex; gap:8px; align-items:center; }
-  .dot{ width:8px; height:8px; border-radius:999px; background:rgba(255,255,255,.6); opacity:.55; }
-  .dot.on{ opacity:1; background:#fff; box-shadow:0 0 8px rgba(255,255,255,.8); }
+/* ===== BOARD ===== */
+#board{
+  position:relative; z-index:1; overflow:hidden;
+  width:100vw; height:100vh;
+  padding:calc(4.2*var(--vh)) calc(1.6*var(--vh)) calc(3.2*var(--vh));
+  box-sizing:border-box;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(242,201,76,.20), transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(156,28,44,.55), transparent 60%),
+    linear-gradient(135deg, var(--pine) 0%, #14513c 45%, var(--berry-dark) 100%);
+  display:flex; flex-direction:column; gap:calc(0.8*var(--vh));
+}
 
-  .medal{
-    display:inline-grid; place-items:center;
-    width:38px; height:38px; border-radius:50%;
-    margin-right:8px; font-weight:1000; font-size:16px; line-height:1;
-    border:1px solid rgba(0,0,0,.1);
-    box-shadow: 0 6px 16px rgba(0,0,0,.08), inset 0 0 16px rgba(255,255,255,.35);
-  }
-  .gold  { background:linear-gradient(180deg,#ffe9a6,#f2c94c); color:#1a1a1a; }
-  .silver{ background:linear-gradient(180deg,#f0f3f6,#cfd6e0); color:#1a1a1a; }
-  .bronze{ background:linear-gradient(180deg,#f3c9a1,#c88a4a); color:#1a1a1a; }
-  .rankwrap{ display:flex; align-items:center; justify-content:center; gap:6px; color:#ffffff; font-weight:850; text-shadow:0 0 10px rgba(255,255,255,.55); }
+h2{
+  margin:0; text-align:center; font-weight:900; letter-spacing:.5px;
+  font-size:calc(4.0*var(--vh)); line-height:1.1;
+  color:var(--gold-soft);
+  text-shadow:0 2px 0 var(--berry-dark), 0 0 18px rgba(242,201,76,.55);
+}
 
-  /* ===== CoD Overlay (10s) ===== */
-  #overlay.cod{position:fixed;inset:0;display:none;place-items:center;z-index:999;
-    background: radial-gradient(900px 700px at 50% 40%, rgba(0,0,0,.2), rgba(0,0,0,.9) 60%, rgba(0,0,0,.96) 100%);}
-  #overlay .burst{
-    position:absolute; inset:0; pointer-events:none; opacity:.3;
-    background:repeating-conic-gradient(from 0deg, rgba(245,214,107,.2) 0deg, transparent 6deg 12deg, rgba(245,214,107,.12) 18deg);
-    mask: radial-gradient(ellipse at center, black 0%, transparent 60%);
-    animation:spin 6s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #card{
-    position:relative; padding:calc(4*var(--vh)) calc(6*var(--vh)); border-radius:calc(2.2*var(--vh));
-    background:linear-gradient(180deg, #0f1417, #141b1f);
-    border:2px solid rgba(245,214,107,.55); color:#fff;
-    text-align:center; animation:pop .45s ease-out;
-    box-shadow:0 0 50px rgba(0,0,0,.6), inset 0 0 28px rgba(245,214,107,.10);
-  }
-  .badge{
-    display:inline-grid; place-items:center;
-    width:110px; height:110px; margin:0 auto calc(1.0*var(--vh));
-    border-radius:50%;
-    border:2px solid #d4b654;
-    box-shadow:0 0 0 2px #1b1b1b, 0 12px 28px rgba(0,0,0,.45), inset 0 0 28px rgba(245,214,107,.18);
-    color:#1a1a1a; font-weight:1000; font-size:40px; text-shadow:0 1px 0 #fff8;
-    background: radial-gradient(circle at 50% 35%, #ffffff22, transparent 60%),
-                linear-gradient(180deg, #f6e6a8, #e0b84a);
-  }
-  .badge.gold{
-    border-color:#e3c14e;
-    background: radial-gradient(circle at 50% 35%, #ffffff22, transparent 60%),
-                linear-gradient(180deg,#ffefb0,#f2c94c);
-  }
-  .badge.silver{
-    border-color:#cfd6e0;
-    background: radial-gradient(circle at 50% 35%, #ffffff22, transparent 60%),
-                linear-gradient(180deg,#f4f7fb,#cfd6e0);
-  }
-  .badge.bronze{
-    border-color:#c88a4a;
-    background: radial-gradient(circle at 50% 35%, #ffffff22, transparent 60%),
-                linear-gradient(180deg,#f7d1ad,#c88a4a);
-  }
-  #who{font:1000 calc(7.6*var(--vh))/1.02 system-ui;letter-spacing:.6px;margin-bottom:calc(.3*var(--vh));}
-  #metaText{font:900 calc(2.4*var(--vh))/1.2 system-ui;margin-top:calc(.2*var(--vh)); color:#e9e1c1;}
-  #rankLine{ margin-top:calc(.8*var(--vh)); font:1000 calc(3.6*var(--vh))/1 system-ui; display:flex; gap:12px; justify-content:center; align-items:center; }
-  .delta{ font:1000 calc(2.0*var(--vh))/1 system-ui; padding:.2em .6em; border-radius:10px; border:1px solid rgba(255,255,255,.2); }
-  .delta.up{ color:#2bd95f; }
-  .delta.down{ color:#ff5757; }
-  .position{ padding:.2em .6em; border-radius:10px; font-weight:1000; border:1px solid rgba(255,255,255,.25); color:#f5d66b; box-shadow:0 0 18px rgba(245,214,107,.25) inset; }
+.chips{
+  display:flex; gap:calc(.6*var(--vh)); flex-wrap:wrap;
+  justify-content:center; margin-top:calc(-.3*var(--vh));
+}
+.chip{
+  padding:calc(.35*var(--vh)) calc(.9*var(--vh));
+  border-radius:999px;
+  background:var(--glass);
+  backdrop-filter:blur(6px);
+  color:var(--cream);
+  border:1px solid rgba(242,201,76,.65);
+  font-weight:800; font-size:calc(1.5*var(--vh));
+  box-shadow:0 0 12px rgba(242,201,76,.25), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.chip.xmas{
+  background:linear-gradient(135deg,var(--berry),#c0283a);
+  border-color:var(--gold);
+}
 
-  @keyframes pop{from{transform:scale(.86);opacity:0}50%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
+/* ===== TABLA ===== */
+.table-wrap{ flex:1; min-height:0; position:relative; }
+table{
+  width:100%; height:100%;
+  border-collapse:separate; border-spacing:0 10px;
+  table-layout:fixed; font-size:calc(1.7*var(--vh));
+}
 
-  /* ===== MONEY RAIN CELEBRATION ===== */
-  #money-container{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:1000;
-    overflow:hidden;
-  }
-  .money{
-    position:fixed;
-    top:-140px;
-    pointer-events:none;
-    z-index:1001;
-    opacity:.9;
-    animation:moneyFall linear forwards;
-    filter:drop-shadow(0 0 8px rgba(0,255,150,.35));
-  }
-  @keyframes moneyFall{
-    0%{ transform:translateY(-140px) rotate(0deg); opacity:0; }
-    10%{ opacity:.9; }
-    100%{ transform:translateY(115vh) rotate(760deg); opacity:0; }
-  }
+thead th{
+  position:sticky; top:0; z-index:2;
+  background:linear-gradient(180deg,#c0283a,var(--berry));
+  color:var(--cream);
+  text-transform:uppercase; letter-spacing:.3px;
+  font-size:calc(1.6*var(--vh)); font-weight:900;
+  padding:calc(.6*var(--vh)) calc(0.9*var(--vh));
+  border-radius:10px;
+  border:1px solid var(--gold);
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+
+th.col-rank, td.col-rank { width:9%; text-align:center; }
+th.col-agent,td.col-agent{ width:30%; text-align:left; }
+th.col-today,td.col-today{ width:12%; text-align:center; }
+th.col-day,  td.col-day  { width:7%;  text-align:center; }
+th.col-total,td.col-total{ width:12%; text-align:center; }
+
+tbody td{
+  background:rgba(255,248,236,.92);
+  border-top:1px solid rgba(242,201,76,.55);
+  border-bottom:1px solid rgba(242,201,76,.55);
+  padding:calc(.7*var(--vh)) calc(0.9*var(--vh));
+}
+tbody tr:nth-child(even) td{ background:rgba(232,247,236,.92); }
+
+tbody tr td:first-child{
+  border-left:4px solid var(--berry);
+  border-top-left-radius:14px; border-bottom-left-radius:14px;
+}
+tbody tr:nth-child(even) td:first-child{ border-left-color:#1f8a5b; }
+tbody tr td:last-child{
+  border-right:1px solid rgba(242,201,76,.55);
+  border-top-right-radius:14px; border-bottom-right-radius:14px;
+}
+tbody tr{ transition:transform .25s ease, box-shadow .25s ease; }
+tbody tr:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.35); }
+
+.rankwrap{ display:inline-flex; align-items:center; justify-content:center; font-weight:900; }
+
+.agent-wrap{ display:flex; align-items:center; gap:12px; min-width:0; }
+.avatar{
+  flex:0 0 auto; width:44px; height:44px; border-radius:50%;
+  background:radial-gradient(circle at 30% 25%, #ff6b7a, var(--berry) 70%);
+  border:2px solid var(--gold);
+  display:grid; place-items:center;
+  font-weight:900; font-size:14px; letter-spacing:.5px;
+  color:#fff; text-transform:uppercase;
+  box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 0 8px rgba(255,255,255,.3);
+}
+tbody tr:nth-child(even) .avatar{
+  background:radial-gradient(circle at 30% 25%, #4fd69a, #17744c 70%);
+}
+.name{
+  font-weight:900; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.bar{
+  position:relative; height:22px; border-radius:999px;
+  background:rgba(15,61,46,.12); border:1px solid rgba(0,0,0,.10); overflow:hidden;
+}
+.bar > .fill{
+  position:absolute; left:0; top:0; bottom:0; width:0%;
+  background:linear-gradient(90deg,#1f8a5b,#7be0a8);
+  box-shadow:0 0 14px rgba(31,138,91,.55); transition:width .8s ease;
+}
+.bar.total > .fill{
+  background:linear-gradient(90deg,#f0a93b,#ffe08a);
+  box-shadow:0 0 14px rgba(242,201,76,.65);
+}
+.bar .value{ position:relative; z-index:1; font-weight:900; font-size:90%; color:var(--ink); }
+
+.spark{
+  position:relative; height:18px; border-radius:8px;
+  background:rgba(156,28,44,.08); border:1px solid rgba(0,0,0,.08);
+  overflow:hidden; display:grid; place-items:center;
+  font-weight:800; font-size:85%;
+}
+.spark .f{
+  position:absolute; left:0; top:0; bottom:0; width:0%;
+  background:linear-gradient(90deg, rgba(192,40,58,.45), rgba(192,40,58,.08));
+  transition:width .6s ease;
+}
+
+#meta{
+  display:flex; justify-content:space-between; align-items:center;
+  font-weight:800; font-size:calc(1.5*var(--vh)); color:var(--cream);
+  position:relative; z-index:6;
+}
+#diag .ok{ color:#9af0c2; }
+#diag .err{ color:#ffb3bb; }
+
+.dots{ display:flex; gap:8px; align-items:center; }
+.dot{
+  width:9px; height:9px; border-radius:999px;
+  background:var(--berry); opacity:.6; border:1px solid var(--gold);
+}
+.dot.on{ opacity:1; background:var(--gold); box-shadow:0 0 10px rgba(242,201,76,.9); }
+
+/* ===== Medals ===== */
+.medal{
+  display:inline-grid; place-items:center;
+  width:38px; height:38px; border-radius:50%;
+  margin-right:8px; font-size:20px; line-height:1;
+  border:1px solid rgba(0,0,0,.15);
+  box-shadow:0 6px 16px rgba(0,0,0,.2), inset 0 0 16px rgba(255,255,255,.35);
+}
+.gold  { background:linear-gradient(180deg,#ffe9a6,#f2c94c); }
+.silver{ background:linear-gradient(180deg,#f0f3f6,#cfd6e0); }
+.bronze{ background:linear-gradient(180deg,#f3c9a1,#c88a4a); }
+
+/* ===== 💡 LUCES NAVIDEÑAS (arriba) ===== */
+.lights{
+  position:fixed; top:0; left:0; right:0; height:calc(4.6*var(--vh));
+  z-index:5; pointer-events:none;
+  display:flex; justify-content:space-around; align-items:flex-start;
+}
+.lights::before{
+  content:""; position:absolute; top:6px; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,#222,#444,#222);
+  border-radius:3px; box-shadow:0 2px 4px rgba(0,0,0,.4);
+}
+.bulb{
+  position:relative; margin-top:8px;
+  width:16px; height:24px; border-radius:50% 50% 50% 50% / 35% 35% 65% 65%;
+  animation:twinkle 1.8s ease-in-out infinite;
+}
+.bulb::before{
+  content:""; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+  width:8px; height:7px; background:#2b2b2b; border-radius:2px 2px 0 0;
+}
+.bulb.c0{ background:#ff3b4e; color:#ff3b4e; }
+.bulb.c1{ background:#ffd23f; color:#ffd23f; }
+.bulb.c2{ background:#2ee59d; color:#2ee59d; }
+.bulb.c3{ background:#4cc3ff; color:#4cc3ff; }
+.bulb{ box-shadow:0 0 14px 3px currentColor; }
+@keyframes twinkle{
+  0%,100%{ opacity:1; filter:brightness(1.15); }
+  50%{ opacity:.35; filter:brightness(.7); }
+}
+
+/* ===== ❄ NIEVE EN EL SUELO ===== */
+.ground{
+  position:fixed; left:0; right:0; bottom:0; height:calc(2.4*var(--vh));
+  z-index:3; pointer-events:none;
+  background:
+    radial-gradient(circle at 10px 0, #fff 10px, transparent 11px) 0 0/40px 100% repeat-x,
+    linear-gradient(180deg, transparent 0, #f4f8ff 40%, #dfe9f7 100%);
+  filter:drop-shadow(0 -2px 6px rgba(255,255,255,.35));
+}
+
+/* ===== OVERLAY — RankUp ===== */
+#overlay.cod{
+  position:fixed; inset:0; display:none; place-items:center; z-index:999;
+  background:radial-gradient(900px 700px at 50% 40%,
+    rgba(156,28,44,.35), rgba(8,42,32,.92) 60%, rgba(0,0,0,.96) 100%);
+}
+#overlay .burst{
+  position:absolute; inset:0; pointer-events:none; opacity:.35;
+  background:repeating-conic-gradient(from 0deg,
+    rgba(242,201,76,.28) 0deg, transparent 6deg 12deg, rgba(255,80,100,.18) 18deg);
+  mask:radial-gradient(ellipse at center, black 0%, transparent 60%);
+  -webkit-mask:radial-gradient(ellipse at center, black 0%, transparent 60%);
+  animation:spin 6s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+@keyframes pop{ 0%{ transform:scale(.6); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+
+#card{
+  position:relative; padding:calc(4*var(--vh)) calc(6*var(--vh));
+  border-radius:calc(2.2*var(--vh));
+  background:linear-gradient(180deg,#0f3d2e,#082a20);
+  border:3px solid var(--gold); color:#fff;
+  text-align:center; animation:pop .45s ease-out;
+  box-shadow:0 0 60px rgba(242,201,76,.35), 0 0 0 6px var(--berry), inset 0 0 28px rgba(242,201,76,.12);
+  overflow:hidden;
+}
+.badge{ font-size:calc(5*var(--vh)); margin-bottom:calc(.5*var(--vh)); position:relative; z-index:2; }
+#who{
+  font:900 calc(7.6*var(--vh))/1.02 system-ui;
+  letter-spacing:.6px; margin-bottom:calc(.3*var(--vh));
+  position:relative; z-index:2; color:var(--gold-soft);
+  text-shadow:0 0 18px rgba(242,201,76,.6);
+}
+#metaText{ font-size:calc(2.6*var(--vh)); font-weight:700; position:relative; z-index:2; }
+#rankLine{ margin-top:calc(1.6*var(--vh)); display:flex; gap:14px; justify-content:center; position:relative; z-index:2; }
+.delta, .position{
+  font-weight:900; font-size:calc(3.4*var(--vh));
+  padding:calc(.4*var(--vh)) calc(1.4*var(--vh)); border-radius:999px;
+}
+.delta.up{ background:#1f8a5b; }
+.delta.down{ background:var(--berry); }
+.position{ background:var(--gold); color:var(--ink); }
+
+/* ===== SANTA ANIMADO ===== */
+.santa-wrap{
+  position:absolute; left:50%; top:calc(3.8*var(--vh));
+  transform:translateX(-130%) translateY(20px);
+  opacity:0; transition:.7s ease-out;
+  pointer-events:none; z-index:1;
+}
+.santa-wrap.show{ transform:translateX(-130%) translateY(0); opacity:1; }
+.santa{ width:80px; height:90px; position:relative; }
+.santa-hat-main{
+  border-left:28px solid transparent; border-right:28px solid transparent;
+  border-bottom:40px solid #e63946; position:absolute; top:0; left:50%; transform:translateX(-50%);
+}
+.santa-hat-brim{
+  width:60px; height:12px; background:#fff; border-radius:999px; position:absolute;
+  top:35px; left:50%; transform:translateX(-50%); box-shadow:0 0 6px rgba(0,0,0,.25);
+}
+.santa-hat-ball{
+  width:14px; height:14px; background:#fff; border-radius:50%; position:absolute;
+  right:-4px; top:22px; box-shadow:0 0 4px rgba(0,0,0,.3);
+}
+.santa-face{
+  width:52px; height:42px; background:#f7d1a3; border-radius:22px; position:absolute;
+  top:26px; left:50%; transform:translateX(-50%); box-shadow:0 0 8px rgba(0,0,0,.35);
+}
+.santa-eyes{ position:absolute; top:13px; left:50%; transform:translateX(-50%); display:flex; gap:10px; }
+.santa-eyes span{ width:6px; height:6px; background:#1b1b1b; border-radius:50%; }
+.santa-nose{
+  width:10px; height:8px; background:#f3b47b; border-radius:999px; position:absolute;
+  top:22px; left:50%; transform:translateX(-50%);
+}
+.santa-beard{
+  width:64px; height:40px; background:#fff; border-radius:50px 50px 46px 46px; position:absolute;
+  bottom:-14px; left:50%; transform:translateX(-50%); box-shadow:0 0 10px rgba(0,0,0,.3);
+}
+
+/* ❄️ NIEVE (overlay) */
+.flake{
+  position:fixed; top:-20px; font-size:14px; color:#fff;
+  pointer-events:none; opacity:.95; z-index:1000;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  0%{ transform:translateY(0) translateX(0) rotate(0deg); }
+  100%{ transform:translateY(110vh) translateX(25px) rotate(360deg); }
+}
+
+/* ===== GIFs ===== */
+
+/* ===== ❄ NIEVE EN LOOP (generada por JS) ===== */
+.snow-layer{
+  position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden;
+}
+.snowflake-css{
+  position:absolute; top:-10vh; color:#fff; opacity:.85;
+  animation:snowLoop linear infinite;
+  text-shadow:0 0 6px rgba(255,255,255,.7);
+}
+@keyframes snowLoop{
+  0%{ transform:translate3d(0,-10vh,0) rotate(0deg); }
+  50%{ transform:translate3d(20px,50vh,0) rotate(180deg); }
+  100%{ transform:translate3d(-10px,110vh,0) rotate(360deg); }
+}
+
+/* ===== 🌲 Pinos / regalos cayendo ===== */
+.pineflake{
+  position:fixed; top:-12vh; font-size:24px;
+  pointer-events:none; opacity:.95; z-index:2;
+  animation:pineFall linear infinite, pineWobble ease-in-out infinite;
+}
+@keyframes pineFall{
+  0%{ top:-12vh; }
+  100%{ top:112vh; }
+}
+@keyframes pineWobble{
+  0%,100%{ margin-left:0; }
+  25%{ margin-left:-12px; }
+  50%{ margin-left:8px; }
+  75%{ margin-left:-6px; }
+}
+
+/* ===== ⭐ ESTRELLAS ===== */
+.star-layer{ position:fixed; inset:0; pointer-events:none; z-index:4; }
+.star{
+  position:absolute; color:#fff3a8; opacity:0;
+  animation:starBlink 3.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 10px rgba(255,235,120,.95));
+}
+@keyframes starBlink{
+  0%{ opacity:0; transform:scale(.9); }
+  50%{ opacity:1; transform:scale(1.35); }
+  100%{ opacity:0; transform:scale(.9); }
+}
 </style>
 </head>
-<body>
-<div id="money-container"></div>
-<div id='board'>
-  <h2>Leaderboard</h2>
 
-  <div id='transferTotal' class='total-card'>
-    <div class='total-label'>Total Transfers</div>
-    <div id='transferTotalValue' class='total-value'>—</div>
-    <div class='total-source'>Daily D40</div>
-  </div>
+<body>
+
+<!-- 🎅 GIFs navideños -->
+
+<!-- 💡 Luces, nieve, pinos, estrellas, suelo (se generan por JS) -->
+<div class="lights" id="lights" aria-hidden="true"></div>
+<div id="pineLayer" aria-hidden="true"></div>
+<div class="snow-layer" id="snowLayer" aria-hidden="true"></div>
+<div class="star-layer" id="starLayer" aria-hidden="true"></div>
+<div class="ground" aria-hidden="true"></div>
+
+<div id='board'>
+  <h2>🎄 MEXROS 🎅</h2>
 
   <div class='chips'>
     <div id='chipWeekly' class='chip'>Week: —</div>
     <div id='chipDaily' class='chip'>Daily: —</div>
+    <div id='chipXmas' class='chip xmas'>🎁 Navidad</div>
   </div>
 
   <div class='table-wrap'>
@@ -276,12 +412,29 @@ border:1px solid rgba(255,255,255,.15); box-shadow:0 0 16px rgba(30,136,255,.65)
   </div>
 </div>
 
+<!-- ===== OVERLAY — RankUp Animation ===== -->
 <div id='overlay' class='cod'>
   <div class='burst'></div>
+
   <div id='card'>
-    <div class='badge'>★</div>
+    <!-- 🎅 Santa animado -->
+    <div class="santa-wrap" id="santaWrap">
+      <div class="santa">
+        <div class="santa-hat-main"></div>
+        <div class="santa-hat-brim"></div>
+        <div class="santa-hat-ball"></div>
+        <div class="santa-face">
+          <div class="santa-eyes"><span></span><span></span></div>
+          <div class="santa-nose"></div>
+          <div class="santa-beard"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class='badge'>🎁</div>
     <div id='who'>Agent</div>
     <div id='metaText'>just passed — today! 🎉</div>
+
     <div id='rankLine'>
       <span class='delta' id='deltaBadge'>▲ +1</span>
       <span class='position' id='posBadge'>#1</span>
@@ -290,11 +443,148 @@ border:1px solid rgba(255,255,255,.15); box-shadow:0 0 16px rgba(30,136,255,.65)
 </div>
 
 <script>
-function setVHVar(){ const vh=window.innerHeight*0.01; document.documentElement.style.setProperty('--vh', `${vh}px`); }
-setVHVar(); window.addEventListener('resize', setVHVar);
 
-/* IDs y API */
-const API_KEY        = "AIzaSyCjcj9JGQHER3LG7i9pNGnb3GOKGzPACsY";
+function setVHVar(){
+  const vh=window.innerHeight*0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+setVHVar();
+window.addEventListener('resize', setVHVar);
+
+/* ===== 💡 Luces navideñas ===== */
+(function buildLights(){
+  const box=document.getElementById('lights');
+  const count=Math.max(12, Math.floor(window.innerWidth/48));
+  for(let i=0;i<count;i++){
+    const b=document.createElement('span');
+    b.className='bulb c'+(i%4);
+    b.style.animationDelay=(-(i%4)*0.45)+'s';
+    box.appendChild(b);
+  }
+})();
+
+/* ===== ❄ Nieve en loop ===== */
+(function buildSnow(){
+  const layer=document.getElementById('snowLayer');
+  const syms=["❄","❆","❅"];
+  for(let i=0;i<36;i++){
+    const f=document.createElement('div');
+    f.className='snowflake-css';
+    f.textContent=syms[i%3];
+    f.style.left=(Math.random()*100)+'%';
+    f.style.fontSize=(12+Math.random()*34)+'px';
+    f.style.animationDuration=(9+Math.random()*9)+'s';
+    f.style.animationDelay=(-Math.random()*16)+'s';
+    f.style.opacity=(.5+Math.random()*.45);
+    layer.appendChild(f);
+  }
+})();
+
+/* ===== 🌲🎁 Pinos y regalitos cayendo ===== */
+(function buildPines(){
+  const layer=document.getElementById('pineLayer');
+  const items=["🌲","🎄","🎁","🔔","🍬","🌲","🎄"];
+  items.forEach((s,i)=>{
+    const p=document.createElement('div');
+    p.className='pineflake';
+    p.textContent=s;
+    p.style.left=(8+i*13)+'%';
+    p.style.animationDuration=(15+Math.random()*6)+'s, '+(3+Math.random()*1.5)+'s';
+    p.style.animationDelay=(-Math.random()*14)+'s, '+(-Math.random()*3)+'s';
+    layer.appendChild(p);
+  });
+})();
+
+/* ===== ⭐ Estrellas ===== */
+(function buildStars(){
+  const layer=document.getElementById('starLayer');
+  const pos=[
+    [8,12,30,0],[15,40,44,.8],[22,70,52,1.4],[35,25,28,2.2],
+    [48,55,60,1.1],[62,15,18,2.8],[75,80,41,1.9],[85,35,50,.5]
+  ];
+  pos.forEach(([t,l,s,d],i)=>{
+    const st=document.createElement('div');
+    st.className='star';
+    st.textContent=i%2?'✧':'✦';
+    st.style.cssText=`top:${t}%;left:${l}%;font-size:${s}px;animation-delay:${d}s;`;
+    layer.appendChild(st);
+  });
+})();
+
+/* ===== 🎁 Cuenta regresiva a Navidad ===== */
+function updateXmasChip(){
+  const now=getLocalDate();
+  let xmas=new Date(now.getFullYear(),11,25);
+  const today0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const diff=Math.round((xmas-today0)/86400000);
+  const el=document.getElementById('chipXmas');
+  if(diff>0)      el.textContent=`🎁 Faltan ${diff} día${diff===1?'':'s'} para Navidad`;
+  else if(diff===0) el.textContent='🎅 ¡Feliz Navidad! 🎄';
+  else            el.textContent='🎆 ¡Felices fiestas!';
+}
+
+/* ===== ❄️ NIEVE + 🎄 ARBOLITOS (overlay) ===== */
+const FLAKES = ["❄","❅","❆","🌲","🎄","🎁"];
+
+function spawnFlakes() {
+  for (let i = 0; i < 12; i++) {
+    const flake = document.createElement("div");
+    flake.className = "flake";
+    flake.textContent = FLAKES[Math.floor(Math.random() * FLAKES.length)];
+
+    const size = Math.random() * 14 + 10;
+    const left = Math.random() * 100;
+
+    flake.style.left = left + "vw";
+    flake.style.fontSize = size + "px";
+    flake.style.animationDuration = (6 + Math.random() * 6) + "s";
+
+    document.body.appendChild(flake);
+    flake.addEventListener("animationend", () => flake.remove());
+  }
+}
+
+function stopFlakes(){
+  document.querySelectorAll(".flake").forEach(f=>f.remove());
+}
+
+/* ===== Overlay Elements ===== */
+const overlay=document.getElementById('overlay');
+const whoEl=document.getElementById('who');
+const metaTextEl=document.getElementById('metaText');
+const deltaBadge=document.getElementById('deltaBadge');
+const posBadge=document.getElementById('posBadge');
+const santaWrap=document.getElementById('santaWrap');
+
+/* ===== 🎅 Rank-Up Animation ===== */
+function showRankUp({name,newRank,delta,passedName}){
+
+  whoEl.textContent = name;
+  metaTextEl.textContent = passedName
+    ? `🎅 ¡Jo jo jo! just passed ${passedName} today!`
+    : `🎅 ¡Jo jo jo! is climbing today!`;
+
+  posBadge.textContent = `#${newRank+1}`;
+  deltaBadge.textContent =
+    (delta>0? "▲ +" : delta<0? "▼ -" : "— ") + Math.abs(delta||0);
+  deltaBadge.className = "delta " + (delta>0? "up" : "down");
+
+  overlay.style.display="grid";
+  santaWrap.classList.add("show");
+
+  spawnFlakes();
+  const flakeTimer = setInterval(spawnFlakes, 900);
+
+  setTimeout(()=>{
+    clearInterval(flakeTimer);
+    stopFlakes();
+    santaWrap.classList.remove("show");
+    overlay.style.display="none";
+  },10000);
+}
+
+/* ===== API KEYS ===== */
+const API_KEY        = "AIzaSyAIysMxUs243-URAhuG8rbt2LxiPCj9jeM";
 const WEEKLY_SHEETID = "1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
 const DAILY_ID_RAW   = "1fCUVAwKIV5_77t2auY9ArQZyrzRplm9IkmVJj1oc4O0";
 
@@ -304,27 +594,26 @@ const PAGE_MS        = 45000;
 const DAILY_REFRESH  = 12000;
 const WEEKLY_REFRESH = 5*60*1000;
 
-let ALL_DATA=[]; let PAGE_INDEX=0;
-let PREV_T=new Map(), PREV_R=new Map(), INITIALIZED=false;
+let ALL_DATA=[];
+let PAGE_INDEX=0;
+let PREV_T=new Map();
+let PREV_R=new Map();
+let INITIALIZED=false;
 
-function diag(t, cls){ document.getElementById('diag').innerHTML = `<span class="${cls||''}">${t}</span>`; }
-function setChipWeekly(t){ document.getElementById('chipWeekly').textContent = `Week: ${t}`; }
-function setChipDaily(t){ document.getElementById('chipDaily').textContent = `Daily: ${t}`; }
-function setTransferTotal(v){ document.getElementById('transferTotalValue').textContent = (v ?? '—'); }
-function getLocalDate(){ const s=new Date().toLocaleString('en-US',{timeZone:TIMEZONE}); return new Date(s); }
+function diag(t, cls){
+  document.getElementById('diag').innerHTML =
+    `<span class="${cls||''}">${t}</span>`;
+}
+function setChipWeekly(t){
+  document.getElementById('chipWeekly').textContent = `Week: ${t}`;
+}
+function setChipDaily(t){
+  document.getElementById('chipDaily').textContent = `Daily: ${t}`;
+}
 
-// W## con padding (W01, W02, ...)
-function computeWeeklyTabName(){
-  const url=new URL(window.location.href);
-  const override=url.searchParams.get('weeklyTab');
-  if(override) return override;
-
-  // 🔥 modo manual: usa la hoja más reciente que exista (W##) buscando hacia abajo desde 60 a 1
-  // (cámbialo si tus tabs pasan de 60)
-  const guess = getLocalDate();
-  const iw = isoWeek(guess);
-  const w = String(iw.week).padStart(2,'0');
-  return `W${w}`;
+function getLocalDate(){
+  const s=new Date().toLocaleString('en-US',{timeZone:TIMEZONE});
+  return new Date(s);
 }
 
 function isoWeek(d){
@@ -334,47 +623,77 @@ function isoWeek(d){
   const y=new Date(Date.UTC(x.getUTCFullYear(),0,1));
   return {week:Math.ceil((((x-y)/86400000)+1)/7), year:x.getUTCFullYear()};
 }
+function weeksInISOYear(y){
+  const d=new Date(Date.UTC(y,11,31));
+  const day=d.getUTCDay();
+  return (day===4 || (d.getUTCDate()===31 && day===3))?53:52;
+}
 
-const emoji=/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{1F900}-\u{1F9FF}\u{2600}-\u{27BF}\u{FE0F}]/gu;
-function normName(s){ return (s||"").replace(emoji,"").normalize('NFD').replace(/[\u0300-\u036f]/g,"").replace(/[^\x20-\x7E]/g,"").replace(/\s{2,}/g," ").trim().toUpperCase(); }
+function computeWeeklyTabName(){
+  const url=new URL(window.location.href);
+  const override=url.searchParams.get('weeklyTab');
+  if(override) return override;
+
+  const local=getLocalDate();
+  const hrs=local.getHours();
+  const dow=local.getDay();
+  const iw=isoWeek(local);
+  let w=iw.week;
+
+  const afterCut=(dow>4) || (dow===4 && hrs>=14);
+  if(afterCut){
+    w++;
+    const mx=weeksInISOYear(iw.year);
+    if(w>mx){ w=1; }
+  }
+  return `W${w}`;
+}
+
+const emoji =
+  /[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{1F900}-\u{1F9FF}\u{2600}-\u{27BF}\u{FE0F}]/gu;
+
+function normName(s){
+  return (s||"")
+    .replace(emoji,"")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^\x20-\x7E]/g,"")
+    .replace(/\s{2,}/g," ")
+    .trim()
+    .toUpperCase();
+}
 function normID(s){ return (s||"").toString().trim(); }
 
-// evita duplicar requests idénticas en paralelo
-const __inFlight = new Map();
-async function fetchSafeJSON(url, {tries=4, baseDelay=650} = {}) {
-  if (__inFlight.has(url)) return __inFlight.get(url);
-
-  const p = (async () => {
-    let lastErr;
-    for (let i = 0; i < tries; i++) {
-      try {
-        const r = await fetch(url, {
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache, no-store, max-age=0', 'Pragma': 'no-cache' },
-        });
-
-        if (r.ok) return await r.json();
-
-        const text = await r.text();
-        // reintentar 429/5xx
-        if (r.status === 429 || (r.status >= 500 && r.status < 600)) {
-          const jitter = Math.random() * 250;
-          await new Promise(res => setTimeout(res, baseDelay * Math.pow(2, i) + jitter));
-          continue;
+/* ===== Safe Fetch with Retry ===== */
+async function fetchSafeJSON(url, {tries=4, baseDelay=700} = {}) {
+  let lastErr;
+  for (let i = 0; i < tries; i++) {
+    try {
+      const r = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, max-age=0',
+          'Pragma': 'no-cache'
         }
-        throw new Error(`HTTP ${r.status} • ${text.slice(0,180)}`);
-      } catch (e) {
-        lastErr = e;
-        const jitter = Math.random() * 250;
-        await new Promise(res => setTimeout(res, baseDelay * Math.pow(2, i) + jitter));
-      }
-    }
-    throw lastErr || new Error('fetchSafeJSON: unknown');
-  })();
+      });
 
-  __inFlight.set(url, p);
-  try { return await p; }
-  finally { __inFlight.delete(url); }
+      if (r.ok) return await r.json();
+
+      const text = await r.text();
+      if (r.status === 429 || (r.status >= 500 && r.status < 600)) {
+        const jitter = Math.random() * 250;
+        await new Promise(res=>setTimeout(res, baseDelay*Math.pow(2,i)+jitter));
+        continue;
+      }
+      throw new Error(`HTTP ${r.status} • ${text.slice(0,180)}`);
+
+    } catch(e){
+      lastErr = e;
+      const jitter = Math.random() * 250;
+      await new Promise(res=>setTimeout(res, baseDelay*Math.pow(2,i)+jitter));
+    }
+  }
+  throw lastErr || new Error("fetchSafeJSON: unknown");
 }
 
 async function readWeeklyTab(weeklyTab){
@@ -389,46 +708,44 @@ async function readWeeklyTab(weeklyTab){
     `${weeklyTab}!O3:O96`
   ].map(encodeURIComponent);
 
-  const url =
-    `https://sheets.googleapis.com/v4/spreadsheets/${WEEKLY_SHEETID}/values:batchGet?`+
-    ranges.map(r=>`ranges=${r}`).join("&")+
-    `&valueRenderOption=UNFORMATTED_VALUE&key=${API_KEY}`;
+  const url=
+    `https://sheets.googleapis.com/v4/spreadsheets/${WEEKLY_SHEETID}/values:batchGet?`
+    + ranges.map(r=>`ranges=${r}`).join("&")
+    + `&valueRenderOption=UNFORMATTED_VALUE&key=${API_KEY}`;
 
-  const j = await fetchSafeJSON(url);
-  const vr = j.valueRanges || [];
+  const j=await fetchSafeJSON(url);
+  const vr=j.valueRanges||[];
 
-  const base = vr[0]?.values || [];
-  const toCol = v => (v?.values || []).map(r => (r[0] ?? "").toString().trim());
+  const base=vr[0]?.values||[];
+  const toCol=v=>(v?.values||[]).map(r=>(r[0]??"").toString().trim());
 
-  const d  = toCol(vr[1]);
-  const f  = toCol(vr[2]);
-  const h  = toCol(vr[3]);
-  const jv = toCol(vr[4]);
-  const l  = toCol(vr[5]);
-  const n  = toCol(vr[6]);
-  const oT = toCol(vr[7]);
+  const d=toCol(vr[1]), f=toCol(vr[2]), h=toCol(vr[3]),
+        jv=toCol(vr[4]), l=toCol(vr[5]), n=toCol(vr[6]),
+        oT=toCol(vr[7]);
 
-  const len = Math.max(base.length,d.length,f.length,h.length,jv.length,l.length,n.length,oT.length);
-  const out = [];
+  const len=Math.max(
+    base.length, d.length, f.length, h.length,
+    jv.length, l.length, n.length, oT.length
+  );
 
+  const out=[];
   for(let i=0;i<len;i++){
     const id = normID(base[i]?.[0] ?? "");
     const name = (base[i]?.[1] ?? "").toString().trim();
     if(!id && !name) continue;
 
-    const wed  = parseInt(d[i]  || 0, 10) || 0;
-    const thu  = parseInt(f[i]  || 0, 10) || 0;
-    const fri  = parseInt(h[i]  || 0, 10) || 0;
-    const sat  = parseInt(jv[i] || 0, 10) || 0;
-    const mon  = parseInt(l[i]  || 0, 10) || 0;
-    const tue  = parseInt(n[i]  || 0, 10) || 0;
-    const total= parseInt(oT[i] || 0, 10) || 0;
-
     out.push({
-      id, idKey:id,
-      name, nameKey:normName(name),
-      wed, thu, fri, sat, mon, tue,
-      total,
+      id,
+      idKey:id,
+      name,
+      nameKey:normName(name),
+      wed:parseInt(d[i]||0),
+      thu:parseInt(f[i]||0),
+      fri:parseInt(h[i]||0),
+      sat:parseInt(jv[i]||0),
+      mon:parseInt(l[i]||0),
+      tue:parseInt(n[i]||0),
+      total:parseInt(oT[i]||0),
       today:0
     });
   }
@@ -438,10 +755,11 @@ async function readWeeklyTab(weeklyTab){
 }
 
 function fmtDailyTab(dt){
-  const m = new Intl.DateTimeFormat('en-US',{month:'short',timeZone:TIMEZONE}).format(dt);
-  const dd = new Intl.DateTimeFormat('en-US',{day:'2-digit',timeZone:TIMEZONE}).format(dt);
+  const m=new Intl.DateTimeFormat('en-US',{month:'short',timeZone:TIMEZONE}).format(dt);
+  const dd=new Intl.DateTimeFormat('en-US',{day:'2-digit',timeZone:TIMEZONE}).format(dt);
   return `${m} ${dd}`;
 }
+
 function getDailyTabCandidates(){
   const url=new URL(window.location.href);
   const o=url.searchParams.get('dailyTab');
@@ -453,43 +771,46 @@ function getDailyTabCandidates(){
 }
 
 async function readDailyApproved(){
-  const rangesFor = tab => ([
-    `${tab}!A2:A40`,`${tab}!B2:B40`,`${tab}!C2:C40`,
-    `${tab}!E2:E40`,`${tab}!F2:F40`,`${tab}!G2:G40`,
-    `${tab}!D40`
-  ].map(encodeURIComponent));
+  const rangesFor=tab=>[
+    `${tab}!A2:A40`,
+    `${tab}!B2:B40`,
+    `${tab}!C2:C40`,
+    `${tab}!E2:E40`,
+    `${tab}!F2:F40`,
+    `${tab}!G2:G40`
+  ].map(encodeURIComponent);
 
-  const tabs = getDailyTabCandidates();
-  const DAILY_IDS = [DAILY_ID_RAW];
+  const tabs=getDailyTabCandidates();
+  const DAILY_IDS=[DAILY_ID_RAW];
 
   for(const id of DAILY_IDS){
     for(const tab of tabs){
-      const url =
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values:batchGet?` +
-        rangesFor(tab).map(r=>`ranges=${r}`).join("&") +
-        `&valueRenderOption=UNFORMATTED_VALUE&key=${API_KEY}`;
+      const url=
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}/values:batchGet?`
+        + rangesFor(tab).map(r=>`ranges=${r}`).join("&")
+        + `&valueRenderOption=UNFORMATTED_VALUE&key=${API_KEY}`;
+
       try{
-        const j = await fetchSafeJSON(url);
-        const vr = j.valueRanges || [];
+        const j=await fetchSafeJSON(url);
+        const vr=j.valueRanges||[];
 
         const A=vr[0]?.values||[], B=vr[1]?.values||[], C=vr[2]?.values||[];
         const E=vr[3]?.values||[], F=vr[4]?.values||[], G=vr[5]?.values||[];
-        const D40 = vr[6]?.values?.[0]?.[0] ?? '—';
 
         const mapByName=new Map();
         const mapByID=new Map();
 
         function addPair(nmCell,idCell,valCell){
-          const nm = (nmCell?.[0] ?? "").toString();
-          const idv = (idCell?.[0] ?? "").toString().trim();
-          const v = parseInt((valCell?.[0] ?? 0),10) || 0;
+          const nm=(nmCell?.[0]??"").toString();
+          const id=(idCell?.[0]??"").toString().trim();
+          const v=parseInt((valCell?.[0]??0))||0;
 
           if(nm.trim()){
             const nk=normName(nm);
             mapByName.set(nk,(mapByName.get(nk)||0)+v);
           }
-          if(idv){
-            mapByID.set(idv,(mapByID.get(idv)||0)+v);
+          if(id){
+            mapByID.set(id,(mapByID.get(id)||0)+v);
           }
         }
 
@@ -499,17 +820,24 @@ async function readDailyApproved(){
         const rowsRG=Math.max(E.length,F.length,G.length);
         for(let i=0;i<rowsRG;i++) addPair(E[i],F[i],G[i]);
 
-        return {id, tab, mapByName, mapByID, totalTransfers:D40};
+        return {id, tab, mapByName, mapByID};
+
       }catch(e){
-        // intenta siguiente tab
+        // intentar siguiente tab
       }
     }
   }
-  return {id:DAILY_IDS[0], tab:tabs[0], mapByName:new Map(), mapByID:new Map(), totalTransfers:'—'};
-}
 
+  return {
+    id:DAILY_IDS[0],
+    tab:tabs[0],
+    mapByName:new Map(),
+    mapByID:new Map()
+  };
+}
 function renderDots(total, activeIndex){
-  const dots=document.getElementById('dots'); dots.innerHTML='';
+  const dots=document.getElementById('dots');
+  dots.innerHTML='';
   for(let i=0;i<total;i++){
     const d=document.createElement('div');
     d.className='dot'+(i===activeIndex?' on':'');
@@ -520,16 +848,19 @@ function renderDots(total, activeIndex){
 function renderPage(list, pageIndex){
   const tbody=document.querySelector("#tbl tbody");
   tbody.innerHTML="";
+
   const start=pageIndex*PAGE_SIZE;
   const page=list.slice(start, start+PAGE_SIZE);
 
   const maxToday=Math.max(1, ...page.map(p=>p.today||0));
   const maxTotal=Math.max(1, ...page.map(p=>p.total||0));
+
   const toPct=(v,max)=>Math.max(3, Math.min(100, Math.round((v/max)*100)));
 
   page.forEach((p,i)=>{
     const rowIndex=start+i;
-    const today=p.today||0, total=p.total||0;
+    const today=p.today||0;
+    const total=p.total||0;
 
     let medalHTML='';
     if (rowIndex===0) medalHTML = `<span class="medal gold" title="1st">🥇</span>`;
@@ -546,18 +877,42 @@ function renderPage(list, pageIndex){
       </td>
       <td class="col-agent">
         <div class="agent-wrap">
-          <div class="avatar">${(p.name||'').split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase()}</div>
+          <div class="avatar">
+            ${(p.name||'').split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase()}
+          </div>
           <div class="name" title="${p.name}">${p.name}</div>
         </div>
       </td>
-      <td class="col-today"><div class="bar today"><div class="fill" style="width:0%"></div><div class="value">${today}</div></div></td>
-      <td class="col-day"><div class="spark"><div class="f" style="width:${toPct(p.wed||0,10)}%"></div>${p.wed||0}</div></td>
-      <td class="col-day"><div class="spark"><div class="f" style="width:${toPct(p.thu||0,10)}%"></div>${p.thu||0}</div></td>
-      <td class="col-day"><div class="spark"><div class="f" style="width:${toPct(p.fri||0,10)}%"></div>${p.fri||0}</div></td>
-      <td class="col-day"><div class="spark"><div class="f" style="width:${toPct(p.sat||0,10)}%"></div>${p.sat||0}</div></td>
-      <td class="col-day"><div class="spark"><div class="f" style="width:${toPct(p.mon||0,10)}%"></div>${p.mon||0}</div></td>
-      <td class="col-day"><div class="spark"><div class="f" style="width:${toPct(p.tue||0,10)}%"></div>${p.tue||0}</div></td>
-      <td class="col-total"><div class="bar total"><div class="fill" style="width:0%"></div><div class="value">${total}</div></div></td>
+      <td class="col-today">
+        <div class="bar today">
+          <div class="fill" style="width:0%"></div>
+          <div class="value">${today}</div>
+        </div>
+      </td>
+      <td class="col-day">
+        <div class="spark"><div class="f" style="width:${toPct(p.wed||0,10)}%"></div>${p.wed||0}</div>
+      </td>
+      <td class="col-day">
+        <div class="spark"><div class="f" style="width:${toPct(p.thu||0,10)}%"></div>${p.thu||0}</div>
+      </td>
+      <td class="col-day">
+        <div class="spark"><div class="f" style="width:${toPct(p.fri||0,10)}%"></div>${p.fri||0}</div>
+      </td>
+      <td class="col-day">
+        <div class="spark"><div class="f" style="width:${toPct(p.sat||0,10)}%"></div>${p.sat||0}</div>
+      </td>
+      <td class="col-day">
+        <div class="spark"><div class="f" style="width:${toPct(p.mon||0,10)}%"></div>${p.mon||0}</div>
+      </td>
+      <td class="col-day">
+        <div class="spark"><div class="f" style="width:${toPct(p.tue||0,10)}%"></div>${p.tue||0}</div>
+      </td>
+      <td class="col-total">
+        <div class="bar total">
+          <div class="fill" style="width:0%"></div>
+          <div class="value">${total}</div>
+        </div>
+      </td>
     `;
     tbody.appendChild(tr);
 
@@ -571,97 +926,43 @@ function renderPage(list, pageIndex){
   renderDots(totalPages, Math.min(pageIndex,totalPages-1));
 }
 
-/* =========================
-   CoD Overlay (Rank-Up)
-========================= */
-const overlay=document.getElementById('overlay');
-const whoEl=document.getElementById('who');
-const metaTextEl=document.getElementById('metaText');
-const deltaBadge=document.getElementById('deltaBadge');
-const posBadge=document.getElementById('posBadge');
-
-function moneyRain(){
-  const container = document.getElementById("money-container");
-  if(!container) return;
-
-  container.innerHTML = "";
-
-  for(let i=0;i<45;i++){
-    const bill = document.createElement("img");
-    bill.src = "https://i.imgur.com/C2oQalE.png";
-    bill.className = "money";
-    bill.style.left = Math.random() * 100 + "vw";
-
-    const size = 210 + Math.random() * 70;
-    bill.style.width = size + "px";
-
-    const duration = 8 + Math.random() * 7;
-    bill.style.animationDuration = duration + "s";
-    bill.style.animationDelay = Math.random() * 2 + "s";
-
-    container.appendChild(bill);
-
-    setTimeout(()=>{
-      bill.remove();
-    },15000);
-  }
-}
-
-function spawnConfetti(){
-  moneyRain();
-}
-
+/* ===== Rank map & Detect Rank-Up ===== */
 function buildTodayRanking(list){
-  const copy=list.map(p=>({ key:p.nameKey, name:p.name, today:Number(p.today||0) }));
+  const copy=list.map(p=>({
+    nameKey:p.nameKey,
+    name:p.name,
+    today:p.today||0
+  }));
   copy.sort((a,b)=>(b.today||0)-(a.today||0));
+
   const rankMap=new Map();
-  copy.forEach((p,i)=>rankMap.set(p.key,i));
+  copy.forEach((p,i)=>rankMap.set(p.nameKey,i));
   return rankMap;
 }
 
-function showRankUp({name,newRank,delta,passedName}){
-  whoEl.textContent = name;
-  metaTextEl.textContent = passedName ? `just passed ${passedName} today!` : `is climbing today!`;
-
-  posBadge.textContent = `#${newRank+1}`;
-  deltaBadge.textContent = (delta>0? '▲ +' : delta<0? '▼ -' : '— ') + Math.abs(delta||0);
-  deltaBadge.className = 'delta ' + (delta>0? 'up':'down');
-
-  const badge = overlay.querySelector('.badge');
-  badge.classList.remove('gold','silver','bronze');
-  if (newRank === 0){ badge.classList.add('gold'); badge.textContent='🥇'; }
-  else if (newRank === 1){ badge.classList.add('silver'); badge.textContent='🥈'; }
-  else if (newRank === 2){ badge.classList.add('bronze'); badge.textContent='🥉'; }
-  else { badge.textContent='★'; }
-
-  overlay.style.display='grid';
-  moneyRain();
-  setTimeout(()=> overlay.style.display='none', 10000);
-}
-
 function detectAndCelebrate(list){
-  const CUR_RANK = buildTodayRanking(list);
+  const CUR_RANK=buildTodayRanking(list);
   let best=null;
 
   list.forEach(p=>{
     const key=p.nameKey;
-    const prev=Number(PREV_T.get(key)||0);
-    const cur=Number(p.today||0);
-    const inc=cur-prev;
+    const prev=(PREV_T.get(key)||0);
+    const cur=(p.today||0);
+    const inc=cur - prev;
 
     if(inc>0){
-      const pr = PREV_R.has(key) ? PREV_R.get(key) : Number.POSITIVE_INFINITY;
-      const nr = CUR_RANK.get(key);
+      const pr=PREV_R.has(key)?PREV_R.get(key):Number.POSITIVE_INFINITY;
+      const nr=CUR_RANK.get(key);
 
       let passed=null;
-      if(nr < pr){
+      if(nr<pr){
         for(let i=nr+1;i<=pr && i<list.length;i++){
           const behind=list.find(x=>CUR_RANK.get(x.nameKey)===i);
           if(behind){ passed=behind.name; break; }
         }
       }
 
-      const delta = (pr===Number.POSITIVE_INFINITY)?0:(pr-nr);
+      const delta=(pr===Number.POSITIVE_INFINITY)?0:(pr-nr);
       const ev={name:p.name,newRank:nr,delta,passedName:passed,inc};
 
       if(!best || ev.inc>best.inc || (ev.inc===best.inc && ev.newRank<best.newRank)){
@@ -670,21 +971,23 @@ function detectAndCelebrate(list){
     }
   });
 
-  PREV_T.clear(); PREV_R.clear();
+  PREV_T.clear();
+  PREV_R.clear();
+
   list.forEach(p=>{
-    PREV_T.set(p.nameKey, Number(p.today||0));
+    PREV_T.set(p.nameKey,p.today||0);
     PREV_R.set(p.nameKey, CUR_RANK.get(p.nameKey));
   });
 
   if(best) showRankUp(best);
 }
 
-/* =========================
-   Caching
-========================= */
+/* ===== CACHES ===== */
 async function getWeeklyCached(weeklyTab, ttl=WEEKLY_REFRESH){
   const Cache=window.__cacheW||(window.__cacheW={at:0,tab:null,data:null});
-  if(Cache.data && Cache.tab===weeklyTab && (Date.now()-Cache.at)<ttl) return Cache.data;
+  if(Cache.data && Cache.tab===weeklyTab && (Date.now()-Cache.at)<ttl)
+    return Cache.data;
+
   const data=await readWeeklyTab(weeklyTab);
   window.__cacheW={at:Date.now(),tab:weeklyTab,data};
   return data;
@@ -693,14 +996,13 @@ async function getWeeklyCached(weeklyTab, ttl=WEEKLY_REFRESH){
 async function getDailyCached(ttl=DAILY_REFRESH-1000){
   const Cache=window.__cacheD||(window.__cacheD={at:0,tab:null,data:null});
   if(Cache.data && (Date.now()-Cache.at)<ttl) return Cache.data;
+
   const data=await readDailyApproved();
   window.__cacheD={at:Date.now(),tab:data.tab,data};
   return data;
 }
 
-/* =========================
-   Refresh
-========================= */
+/* ===== REFRESH FNS ===== */
 async function refreshWeekly(){
   try{
     const weeklyTab=computeWeeklyTabName();
@@ -714,33 +1016,33 @@ async function refreshWeekly(){
 
 async function refreshDaily(){
   try{
-    const {tab,mapByName,mapByID,totalTransfers}=await getDailyCached(DAILY_REFRESH);
+    const {id,tab,mapByName,mapByID}=await getDailyCached(DAILY_REFRESH);
     setChipDaily(tab);
-    setTransferTotal(totalTransfers);
 
     if(!ALL_DATA.length){
       await refreshWeekly();
       if(!ALL_DATA.length) return;
     }
 
-    // asigna TODAY al weekly list
     ALL_DATA.forEach(p=>{
       const vID=mapByID.get(p.idKey);
       const vNM=mapByName.get(p.nameKey);
-      p.today = (typeof vID==='number' && !Number.isNaN(vID)) ? vID :
-                (typeof vNM==='number' && !Number.isNaN(vNM)) ? vNM : 0;
+      p.today = (typeof vID==='number' && !Number.isNaN(vID))
+        ? vID
+        : (typeof vNM==='number' && !Number.isNaN(vNM))
+          ? vNM
+          : 0;
     });
 
-    // 🔥 popup rank-up
     if(INITIALIZED){
       detectAndCelebrate(ALL_DATA);
-    } else {
-      const r = buildTodayRanking(ALL_DATA);
+    }else{
+      const r=buildTodayRanking(ALL_DATA);
       ALL_DATA.forEach(p=>{
-        PREV_T.set(p.nameKey, Number(p.today||0));
+        PREV_T.set(p.nameKey,p.today||0);
         PREV_R.set(p.nameKey, r.get(p.nameKey));
       });
-      INITIALIZED = true;
+      INITIALIZED=true;
     }
 
     diag(`Daily OK (${tab})`,'ok');
@@ -749,6 +1051,7 @@ async function refreshDaily(){
   }
 }
 
+/* ===== ROTATE PAGES ===== */
 function rotatePage(){
   if(!ALL_DATA.length) return;
   const totalPages=Math.max(1, Math.ceil(ALL_DATA.length/PAGE_SIZE));
@@ -758,14 +1061,20 @@ function rotatePage(){
   PAGE_INDEX=(PAGE_INDEX+1)%totalPages;
 }
 
+/* ===== START APP ===== */
 (async function start(){
+  updateXmasChip();
+  setInterval(updateXmasChip, 60*60*1000);
+
   await refreshWeekly();
   await refreshDaily();
   rotatePage();
+
   setInterval(refreshWeekly, WEEKLY_REFRESH);
   setInterval(refreshDaily,  DAILY_REFRESH);
   setInterval(rotatePage,    PAGE_MS);
 })();
+
 </script>
 </body>
 </html>
